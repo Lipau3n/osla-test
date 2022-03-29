@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  app:
+    build: src
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - postgres
+    restart: on-failure
+    volumes:
+      - ./src/:/app
+    ports:
+      - "8000:8000"
+
+  postgres:
+    image: "postgres:12.5"
+    restart: always
+    volumes:
+      - ./volumes/pgdata:/var/lib/postgresql/data:rw
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: [ "CMD", "nc", "localhost", "5432" ]
+      interval: 25s
+      timeout: 15s
+      retries: 10
